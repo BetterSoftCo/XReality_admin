@@ -1,0 +1,7 @@
+{
+  // config next js with Eslint
+  "extends": ["next", "next/core-web-vitals"],
+  "rules": {
+    "@next/next/no-document-import-in-page": "off"
+  }
+}
