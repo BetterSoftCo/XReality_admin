@@ -8,14 +8,12 @@ import AdminLayout from 'layouts/AdminLayout'
 import { NextApiResponse } from 'next'
 import { useRouter } from 'next/router'
 import { PreviewImage } from 'components/Preview'
-import Image from 'next/image'
-import { values } from 'lodash'
-import { url } from 'inspector'
+import axios from 'axios'
 
 const AddTarget = () => {
   const { data: session } = useSession()
   const [userId, setUserId] = useState('')
-  const [categoryId, setCategoryId] = useState('')
+  var categoryId = ''
 
   const router = useRouter()
 
@@ -48,8 +46,6 @@ const AddTarget = () => {
 
   const addData = async (values: any) => {
     const JSONdata = JSON.stringify(values)
-    console.log('values', values)
-
     const endpoint = 'https://xrealityapi.sinamn75.com/api/Category'
     const options = {
       method: 'POST',
@@ -60,30 +56,32 @@ const AddTarget = () => {
       },
       body: JSONdata,
     }
-
     const response = await fetch(endpoint, options)
     const result = await response.json()
 
     if (result.status == 200) {
-      setCategoryId(result.result.id)
+      categoryId = result.result.id.toString()
+      console.log('result', result)
+
+      //add media
+      addDataMedia(values)
     }
     if (result.status == 401) showToast('error')
   }
 
-  const addDataMedia = async (valuesMedia: any) => {
-    // var mediaList = []
-    // mediaList[0] = {
-    //   // type: `${valuesMedia.type}`,
-    //   type: 0,
-    //   useCase: 'category',
-    //   link: '',
-    //   title: `${valuesMedia.name}`,
-    // }
-    // console.log('mediaList[0]', mediaList[0])
+  const addDataMedia = async (values: any) => {
+    const formData = new FormData()
 
-    // const JSONdataMedia = JSON.stringify(mediaList[0])
-    //
-    // console.log('JSONdataMedia', JSONdataMedia)
+    formData.append('UserId', userId)
+    formData.append('NotificationId', '')
+    formData.append('ProductId', '')
+    formData.append('Visibility', '')
+    formData.append('ContentId', '')
+    formData.append('UseCase', 'category')
+    formData.append('UserId', userId)
+    formData.append('files', values.media)
+    formData.append('Title', `${values.media.name}`)
+    formData.append('CategoryId', `${categoryId}`)
 
     const endpointMedia = 'https://xrealityapi.sinamn75.com/api/Media'
     const optionsMedia = {
@@ -91,24 +89,14 @@ const AddTarget = () => {
       headers: {
         Accept: 'text/plain',
         Authorization: `${session?.accessToken}`,
-        'Content-Type': 'multipart/form-data',
-        UserId: `${userId}`,
-        NotificationId: '',
-        ProductId: '',
-        Visibility: '1',
-        ContentId: '',
-        UseCase: 'category',
-        Files: `@${valuesMedia.name};type=${valuesMedia.type}`,
-        Title: `${valuesMedia.name}`,
-        CategoryId: `${categoryId}`,
       },
-      // body: JSONdataMedia,
+      body: formData,
     }
 
     const responseMedia = await fetch(endpointMedia, optionsMedia)
-    const resultMedia = await responseMedia.json()
 
-    console.log('responseMedia', responseMedia)
+    const resultMedia = await responseMedia.json()
+    console.log('resultMedia', resultMedia)
 
     if (resultMedia.status == 200) {
       showToast('success')
@@ -118,10 +106,7 @@ const AddTarget = () => {
   }
 
   const onSubmit = async (values: any, e: any) => {
-    //-------------add data---------------
-    await addData(values)
-    //------------add media data----------
-    await addDataMedia(values.media)
+    addData(values)
   }
 
   const validationSchema = Yup.object({
@@ -149,7 +134,6 @@ const AddTarget = () => {
                 initialValues={initialValues}
                 validationSchema={validationSchema}
                 onSubmit={onSubmit}
-                enctype="multipart/form-data"
               >
                 {(formProps) => (
                   <Form
@@ -169,9 +153,6 @@ const AddTarget = () => {
                           </label>
                           <div
                             className={`mt-1 flex justify-center px-6 py-10 border-2 border-gray-300 border-dashed rounded-md`}
-                            // style={{
-                            //   backgroundImage: `url(${formProps.values.media})`,
-                            // }}
                           >
                             <div className="space-y-1 text-center bg-white">
                               <svg
