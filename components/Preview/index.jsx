@@ -9,10 +9,17 @@ export function PreviewImage({ file }) {
   reader.onload = () => {
     setPreview(reader.result)
   }
+
   return (
     <div>
       {preview && (
-        <Image src={preview} alt="preview" width={500} height={250} />
+        <Image
+          src={preview}
+          alt="preview"
+          width={80}
+          height={80}
+          className="rounded-lg"
+        />
       )}
     </div>
   )
