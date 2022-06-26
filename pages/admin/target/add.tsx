@@ -8,13 +8,13 @@ import AdminLayout from 'layouts/AdminLayout'
 import { NextApiResponse } from 'next'
 import { useRouter } from 'next/router'
 import { PreviewImage } from 'components/Preview'
-import axios from 'axios'
 import { ViewGridAddIcon, XIcon } from '@heroicons/react/outline'
+import { StarIcon } from '@heroicons/react/solid'
 
 const AddTarget = () => {
   const { data: session } = useSession()
   const [userId, setUserId] = useState('')
-  const [resetMedia, setResetMedia] = useState(null)
+  const [image, setImage] = useState(null)
 
   var categoryId = ''
 
@@ -22,7 +22,7 @@ const AddTarget = () => {
 
   useEffect(() => {
     setUserId(session?.user?.id)
-  }, [])
+  }, [image])
 
   const showToast = (type: any) => {
     if (type == 'success') {
@@ -41,9 +41,6 @@ const AddTarget = () => {
     titleTr1: '',
     subtitle: '',
     link: '',
-    color: '',
-    useCase: '',
-    type: '',
     media: null,
   }
 
@@ -108,9 +105,12 @@ const AddTarget = () => {
     if (resultMedia.status == 401) showToast('error')
   }
 
-  const onSubmit = async (values: any, { resetForm }: any) => {
+  const onSubmit = async (values: any) => {
     addData(values)
-    resetForm({ values: '' })
+  }
+
+  const handleReset = (resetForm: any) => {
+    resetForm()
   }
 
   const validationSchema = Yup.object({
@@ -150,6 +150,7 @@ const AddTarget = () => {
                         <div className="col-span-12 sm:col-span-6">
                           <label className="block text-sm fontmedium text-gray-700">
                             آپلود عکس تارگت
+                            <StarIcon className="w-2 h-2 text-red-500 inline" />
                           </label>
                           <div
                             className={`mt-1 flex justify-center px-6 py-10 border-2 border-gray-300 border-dashed rounded-md`}
@@ -168,7 +169,7 @@ const AddTarget = () => {
                                     type="file"
                                     className="sr-only"
                                     accept="image/*"
-                                    onChange={(e) => {
+                                    onChange={(e: any) => {
                                       formProps.setFieldValue(
                                         'media',
                                         e.target.files[0],
@@ -183,11 +184,14 @@ const AddTarget = () => {
                               </p>
                             </div>
                           </div>
+                          {/* preview image */}
                           <div className="mt-5">
                             {formProps.values.media ? (
                               <>
                                 <PreviewImage file={formProps.values.media} />
-                                <XIcon className="w-7 h-7 bg-gray-200 text-indigo-600 rounded-lg p-1 cursor-pointer" />
+                                <button>
+                                  <XIcon className="w-7 h-7 bg-gray-200 text-indigo-600 rounded-lg p-1 cursor-pointer" />
+                                </button>
                               </>
                             ) : null}
                           </div>
@@ -199,6 +203,7 @@ const AddTarget = () => {
                             className="block text-sm font-medium text-gray-700"
                           >
                             عنوان
+                            <StarIcon className="w-2 h-2 text-red-500 inline" />
                           </label>
                           <Field
                             className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
@@ -256,60 +261,13 @@ const AddTarget = () => {
                             placeholder="لینک"
                           />
                         </div>
-                        {/* رنگ */}
-                        <div className="col-span-6 sm:col-span-3">
-                          <label
-                            htmlFor="color"
-                            className="block text-sm font-medium text-gray-700"
-                          >
-                            رنگ
-                          </label>
-                          <Field
-                            className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                            type="text"
-                            id="color"
-                            name="color"
-                            placeholder="رنگ"
-                          />
-                        </div>
-                        {/* useCase */}
-                        <div className="col-span-6 sm:col-span-3">
-                          <label
-                            htmlFor="useCase"
-                            className="block text-sm font-medium text-gray-700"
-                          >
-                            useCase
-                          </label>
-                          <Field
-                            className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                            type="text"
-                            id="useCase"
-                            name="useCase"
-                            placeholder="useCase"
-                          />
-                        </div>
-                        {/* نوع */}
-                        <div className="col-span-6 sm:col-span-3">
-                          <label
-                            htmlFor="type"
-                            className="block text-sm font-medium text-gray-700"
-                          >
-                            نوع
-                          </label>
-                          <Field
-                            className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                            type="text"
-                            id="type"
-                            name="type"
-                            placeholder="نوع"
-                          />
-                        </div>
                       </div>
                     </div>
                     <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
                       <button
                         type="submit"
                         className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        // onClick={handleReset.bind(null, formProps.resetForm)}
                       >
                         ارسال
                       </button>
