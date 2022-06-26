@@ -112,6 +112,12 @@ export default function Upgrade() {
         },
       ],
     },
+    {
+      id: 4,
+      packageName: 'EXTRA',
+      price: 'تماس بگیرید',
+      items: [],
+    },
   ]
   return (
     <>
@@ -125,7 +131,7 @@ export default function Upgrade() {
             نیاز خود را انتخاب و در هزینه‌های‌تان صرفه‌جویی کنید.
           </p>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-4 gap-4">
             {packages.map((item) => (
               <UpgradePackageItem key={item.id} item={item} />
             ))}
