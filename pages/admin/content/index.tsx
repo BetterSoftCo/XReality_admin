@@ -22,7 +22,7 @@ type contentType = {
 }
 
 const Contents = ({ contents }: any) => {
-  const { data: session, status } = useSession()
+  const { data: session } = useSession()
   const router = useRouter()
 
   const showAlert = (contentId: string) => {
@@ -48,6 +48,8 @@ const Contents = ({ contents }: any) => {
   }
 
   const deleteContent = async (contentId: string) => {
+    console.log('contentId', contentId)
+
     const endpoint = `https://xrealityapi.sinamn75.com/api/Product/${contentId}`
     const options = {
       method: 'DELETE',
@@ -84,45 +86,47 @@ const Contents = ({ contents }: any) => {
                 <table className="min-w-full leading-normal">
                   <thead>
                     <tr>
+                      {/* شماره ردیف */}
                       <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600">
                         شماره ردیف
                       </th>
+                      {/* عنوان */}
                       <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600">
                         عنوان
                       </th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600">
-                        زیرعنوان
-                      </th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600">
-                        توضیحات
-                      </th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600">
-                        جزییات
-                      </th>
+                      {/* نوع */}
                       <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600">
                         نوع
                       </th>
+                      {/* واحد */}
                       <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600">
                         واحد
                       </th>
+                      {/* usecase */}
                       <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600">
                         useCase
                       </th>
+                      {/* طول */}
                       <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600">
                         طول
                       </th>
+                      {/* عرض */}
                       <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600">
                         عرض
                       </th>
+                      {/* ارتفاع */}
                       <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600">
                         ارتفاع
                       </th>
+                      {/* وزن */}
                       <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600">
                         وزن
                       </th>
+                      {/* وضعیت */}
                       <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600">
                         وضعیت
                       </th>
+                      {/* عملیات */}
                       <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600">
                         عملیات
                       </th>
@@ -132,6 +136,7 @@ const Contents = ({ contents }: any) => {
                     {contents.map((content: contentType, index: number) => (
                       <>
                         <tr>
+                          {/* شماره ردیف */}
                           <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <div className="flex items-center">
                               <div className="ml-3">
@@ -141,32 +146,13 @@ const Contents = ({ contents }: any) => {
                               </div>
                             </div>
                           </td>
+                          {/* عنوان */}
                           <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <p className="text-gray-900 whitespace-no-wrap">
                               {content.title}
                             </p>
                           </td>
-                          <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p className="text-gray-900 whitespace-no-wrap">
-                              {content.subtitle}
-                            </p>
-                          </td>
-                          <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p className="text-gray-900 whitespace-no-wrap">
-                              {content.description}
-                            </p>
-                          </td>
-                          <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <span className="relative inline-block px-3 py-1 font-semibold text-yellow-700 leading-tight">
-                              <span
-                                aria-hidden
-                                className="absolute inset-0 bg-yellow-100 opacity-50 rounded-full"
-                              ></span>
-                              <span className="relative">
-                                {content.details}
-                              </span>
-                            </span>
-                          </td>
+                          {/* نوع */}
                           <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <span className="relative inline-block px-3 py-1 font-semibold text-blue-700 leading-tight">
                               <span
@@ -176,6 +162,7 @@ const Contents = ({ contents }: any) => {
                               <span className="relative">{content.type}</span>
                             </span>
                           </td>
+                          {/* واحد */}
                           <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <span className="relative inline-block px-3 py-1 font-semibold text-green-700 leading-tight">
                               <span
@@ -185,36 +172,43 @@ const Contents = ({ contents }: any) => {
                               <span className="relative">{content.unit}</span>
                             </span>
                           </td>
+                          {/* usecase */}
                           <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <p className="text-gray-900 whitespace-no-wrap">
                               {content.useCase}
                             </p>
                           </td>
+                          {/* طول */}
                           <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <p className="text-gray-900 whitespace-no-wrap">
                               {content.length}
                             </p>
                           </td>
+                          {/* عرض */}
                           <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <p className="text-gray-900 whitespace-no-wrap">
                               {content.width}
                             </p>
                           </td>
+                          {/* ارتفاع */}
                           <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <p className="text-gray-900 whitespace-no-wrap">
                               {content.height}
                             </p>
                           </td>
+                          {/* وزن */}
                           <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <p className="text-gray-900 whitespace-no-wrap">
                               {content.weight}
                             </p>
                           </td>
+                          {/* وضعیت */}
                           <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <p className="text-gray-900 whitespace-no-wrap">
                               {content.status}
                             </p>
                           </td>
+                          {/* عملیات */}
                           <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <div className="flex justify-center items-center gap-x-4">
                               <Link href={`content/${content.id}`} passHref>
@@ -263,7 +257,7 @@ export async function getServerSideProps(context: any) {
   const session = await getSession(context)
 
   const getAllContent = async () => {
-    const endpoint = 'https://xrealityapi.sinamn75.com/api/Product'
+    const endpoint = 'https://xrealityapi.sinamn75.com/api/Product/Mine'
     const options = {
       method: 'GET',
       headers: {
