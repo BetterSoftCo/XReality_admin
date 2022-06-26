@@ -14,7 +14,10 @@ import {
   ViewGridAddIcon,
   XIcon,
 } from '@heroicons/react/outline'
+
+import { StarIcon } from '@heroicons/react/solid'
 import Image from 'next/image'
+import { initial } from 'lodash'
 
 const imageTypeRegex = /image\/(png|jpg|jpeg)/gm
 
@@ -31,6 +34,7 @@ const AddContent = () => {
   const [Active, setActive] = useState(FILE_TYPES.gallery)
   const [imageFiles, setImageFiles] = useState([])
   const [images, setImages] = useState([])
+  const [DeleteFile, setDeleteFile] = useState(0)
 
   var productId = ''
 
@@ -52,7 +56,6 @@ const AddContent = () => {
 
   useEffect(() => {
     setUserId(session?.user?.id)
-
     // preview uploaded images
     const images: any = [],
       fileReaders: any[] = []
@@ -73,6 +76,8 @@ const AddContent = () => {
         fileReader.readAsDataURL(file)
       })
     }
+    console.log('images', images)
+
     return () => {
       isCancel = true
       fileReaders.forEach((fileReader) => {
@@ -111,7 +116,7 @@ const AddContent = () => {
     height: 0,
     weight: 0,
     status: 0,
-    media: null,
+    media: imageFiles,
   }
 
   const addData = async (values: any) => {
@@ -151,6 +156,10 @@ const AddContent = () => {
     formData.append('UseCase', 'Product')
     formData.append('UserId', userId)
     // upload list of files
+    // values.media.forEach((file: any, index: any) => {
+    //   formData.append(`file${index}`, values.media[index])
+    // })
+
     for (let i = 0; i < values.media.length; i++) {
       formData.append('Files', values.media[i])
     }
@@ -163,6 +172,7 @@ const AddContent = () => {
       headers: {
         Accept: 'text/plain',
         Authorization: `${session?.accessToken}`,
+        // 'Content-Type': 'multipart/form-data',
       },
       body: formData,
     }
@@ -174,7 +184,7 @@ const AddContent = () => {
 
     if (resultMedia.status == 200) {
       showToast('success')
-      // router.push('/admin/target')
+      router.push('/admin/content')
     }
     if (resultMedia.status == 401) showToast('error')
   }
@@ -198,8 +208,22 @@ const AddContent = () => {
     height: Yup.number().integer(),
     weight: Yup.number().integer(),
     // status: Yup.number().positive().integer(),
-    media: Yup.string().required('لطفا محتوا را آپلود کنید').nullable(),
+    media: Yup.array()
+      .min(1, 'لطفا حداقل یک فایل آپلود کنید')
+      .required('لطفا محتوا را آپلود کنید')
+      .nullable(),
   })
+
+  const handleDeleteFile = (idx: any) => {
+    setDeleteFile(idx)
+    console.log('DeleteFile', DeleteFile)
+
+    var files_result = imageFiles
+      .filter((file, index) => index !== idx)
+      .map((file) => file)
+
+    setImageFiles(files_result)
+  }
 
   return (
     <>
@@ -227,6 +251,7 @@ const AddContent = () => {
                         <div className="group col-span-6 sm:col-span-2">
                           <label className="block text-sm fontmedium text-gray-700">
                             آپلود گالری تصاویر
+                            <StarIcon className="w-2 h-2 text-red-500 inline" />
                           </label>
                           <div
                             className={`mt-1 flex justify-center px-6 py-10 border-2 border-gray-300 border-dashed rounded-md group-hover:bg-indigo-400 ${
@@ -263,15 +288,17 @@ const AddContent = () => {
                                         name="media"
                                         type="file"
                                         className="sr-only"
-                                        multiple
                                         accept="image/*"
-                                        onChange={(e) => {
+                                        onChange={(e: any) => {
+                                          const files = e.target.files
+                                          let myFiles = Array.from(files)
                                           formProps.setFieldValue(
                                             'media',
-                                            e.target.files,
+                                            myFiles,
                                           )
                                           changeHandler(e)
                                         }}
+                                        multiple
                                       />
                                     </>
                                   )}
@@ -292,6 +319,7 @@ const AddContent = () => {
                         >
                           <label className="block text-sm fontmedium text-gray-700">
                             آپلود ویدئو
+                            <StarIcon className="w-2 h-2 text-red-500 inline" />
                           </label>
                           <div
                             className={`mt-1 flex justify-center px-6 py-10 border-2 border-gray-300 border-dashed rounded-md group-hover:bg-indigo-400 ${
@@ -345,6 +373,7 @@ const AddContent = () => {
                         >
                           <label className="block text-sm fontmedium text-gray-700">
                             آپلود فایل سه بعدی
+                            <StarIcon className="w-2 h-2 text-red-500 inline" />
                           </label>
                           <div
                             className={`mt-1 flex justify-center px-6 py-10 border-2 border-gray-300 border-dashed rounded-md group-hover:bg-indigo-400 ${
@@ -403,7 +432,7 @@ const AddContent = () => {
                           />
                           {images.length > 0 ? (
                             <div className="grid grid-cols-12 gap-4">
-                              {images.map((image, idx) => {
+                              {images.map((image, idx: number) => {
                                 return (
                                   <div key={idx}>
                                     <Image
@@ -413,7 +442,12 @@ const AddContent = () => {
                                       height={100}
                                       className="rounded-lg"
                                     />
-                                    <XIcon className="w-6 h-6 bg-gray-200 text-indigo-600 rounded-lg p-1 cursor-pointer" />
+                                    <XIcon
+                                      className="w-6 h-6 bg-gray-200 text-indigo-600 rounded-lg p-1 cursor-pointer"
+                                      onClick={() => {
+                                        handleDeleteFile(idx)
+                                      }}
+                                    />
                                   </div>
                                 )
                               })}
@@ -427,6 +461,7 @@ const AddContent = () => {
                             className="block text-sm font-medium text-gray-700"
                           >
                             عنوان
+                            <StarIcon className="w-2 h-2 text-red-500 inline" />
                           </label>
                           <Field
                             className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
