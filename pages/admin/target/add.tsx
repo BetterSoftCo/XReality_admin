@@ -9,10 +9,13 @@ import { NextApiResponse } from 'next'
 import { useRouter } from 'next/router'
 import { PreviewImage } from 'components/Preview'
 import axios from 'axios'
+import { ViewGridAddIcon, XIcon } from '@heroicons/react/outline'
 
 const AddTarget = () => {
   const { data: session } = useSession()
   const [userId, setUserId] = useState('')
+  const [resetMedia, setResetMedia] = useState(null)
+
   var categoryId = ''
 
   const router = useRouter()
@@ -105,8 +108,9 @@ const AddTarget = () => {
     if (resultMedia.status == 401) showToast('error')
   }
 
-  const onSubmit = async (values: any, e: any) => {
+  const onSubmit = async (values: any, { resetForm }: any) => {
     addData(values)
+    resetForm({ values: '' })
   }
 
   const validationSchema = Yup.object({
@@ -142,10 +146,6 @@ const AddTarget = () => {
                   >
                     <div className="shadow overflow-hidden sm:rounded-md">
                       <div className="grid grid-cols-6 gap-6 p-8">
-                        {formProps.values.media ? (
-                          <PreviewImage file={formProps.values.media} />
-                        ) : null}
-
                         {/* عکس تارگت */}
                         <div className="col-span-12 sm:col-span-6">
                           <label className="block text-sm fontmedium text-gray-700">
@@ -155,20 +155,7 @@ const AddTarget = () => {
                             className={`mt-1 flex justify-center px-6 py-10 border-2 border-gray-300 border-dashed rounded-md`}
                           >
                             <div className="space-y-1 text-center bg-white">
-                              <svg
-                                className="mx-auto h-12 w-12 text-gray-400"
-                                stroke="currentColor"
-                                fill="none"
-                                viewBox="0 0 48 48"
-                                aria-hidden="true"
-                              >
-                                <path
-                                  d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                                  strokeWidth={2}
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
+                              <ViewGridAddIcon className="mx-auto h-8 w-8 text-gray-300 group-hover:text-white" />
                               <div className="flex text-lg text-gray-600">
                                 <label
                                   htmlFor="media"
@@ -195,6 +182,14 @@ const AddTarget = () => {
                                 PNG, JPG, JPEG
                               </p>
                             </div>
+                          </div>
+                          <div className="mt-5">
+                            {formProps.values.media ? (
+                              <>
+                                <PreviewImage file={formProps.values.media} />
+                                <XIcon className="w-7 h-7 bg-gray-200 text-indigo-600 rounded-lg p-1 cursor-pointer" />
+                              </>
+                            ) : null}
                           </div>
                         </div>
                         {/* عنوان */}
