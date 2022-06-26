@@ -43,8 +43,8 @@ const Targets = ({ targets }: any) => {
     })
   }
 
-  const deleteTarget = async (targetId: string) => {
-    const endpoint = `https://xrealityapi.sinamn75.com/api/category/${targetId}`
+  const deleteMediaTarget = async (targetId: string) => {
+    const endpoint = `https://xrealityapi.sinamn75.com/api/Media/${targetId}`
     const options = {
       method: 'DELETE',
       headers: {
@@ -53,9 +53,31 @@ const Targets = ({ targets }: any) => {
       },
     }
     const response = await fetch(endpoint, options)
+    console.log('response', response)
+
     if (response.status == 200) {
       router.push('/admin/target')
     }
+  }
+
+  const deleteTarget = async (targetId: string) => {
+    //delete media first
+    deleteMediaTarget(targetId)
+    //delete data second
+    //TODO: DELETE MEDIA AND TARGET
+
+    // const endpoint = `https://xrealityapi.sinamn75.com/api/category/${targetId}`
+    // const options = {
+    //   method: 'DELETE',
+    //   headers: {
+    //     Accept: '*/*',
+    //     Authorization: `${session?.accessToken}`,
+    //   },
+    // }
+    // const response = await fetch(endpoint, options)
+    // if (response.status == 200) {
+    //   router.push('/admin/target')
+    // }
   }
 
   return (
@@ -80,30 +102,27 @@ const Targets = ({ targets }: any) => {
                 <table className="min-w-full leading-normal">
                   <thead>
                     <tr>
+                      {/* شماره ردیف */}
                       <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600">
                         شماره ردیف
                       </th>
+                      {/* عنوان */}
                       <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600">
                         عنوان
                       </th>
+                      {/* عنوان1 */}
                       <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600">
                         عنوان1
                       </th>
+                      {/* زیرعنوان */}
                       <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600">
                         زیرعنوان
                       </th>
+                      {/* لینک */}
                       <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600">
                         لینک
                       </th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600">
-                        رنگ
-                      </th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600">
-                        usecase
-                      </th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600">
-                        type
-                      </th>
+                      {/* عملیات */}
                       <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600">
                         عملیات
                       </th>
@@ -113,6 +132,7 @@ const Targets = ({ targets }: any) => {
                     {targets.map((target: targetType, index: number) => (
                       <>
                         <tr>
+                          {/* شماره ردیف */}
                           <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <div className="flex items-center">
                               <div className="ml-3">
@@ -122,21 +142,25 @@ const Targets = ({ targets }: any) => {
                               </div>
                             </div>
                           </td>
+                          {/* عنوان */}
                           <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <p className="text-gray-900 whitespace-no-wrap">
                               {target.title}
                             </p>
                           </td>
+                          {/* عنوان 1 */}
                           <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <p className="text-gray-900 whitespace-no-wrap">
                               {target.titleTr1}
                             </p>
                           </td>
+                          {/* زیرعنوان */}
                           <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <p className="text-gray-900 whitespace-no-wrap">
                               {target.subtitle}
                             </p>
                           </td>
+                          {/* لینک */}
                           <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <span className="relative inline-block px-3 py-1 font-semibold text-yellow-700 leading-tight">
                               <span
@@ -146,29 +170,7 @@ const Targets = ({ targets }: any) => {
                               <span className="relative">{target.link}</span>
                             </span>
                           </td>
-                          <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <span className="relative inline-block px-3 py-1 font-semibold text-blue-700 leading-tight">
-                              <span
-                                aria-hidden
-                                className="absolute inset-0 bg-blue-100 opacity-50 rounded-full"
-                              ></span>
-                              <span className="relative">{target.color}</span>
-                            </span>
-                          </td>
-                          <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <span className="relative inline-block px-3 py-1 font-semibold text-green-700 leading-tight">
-                              <span
-                                aria-hidden
-                                className="absolute inset-0 bg-green-100 opacity-50 rounded-full"
-                              ></span>
-                              <span className="relative">{target.useCase}</span>
-                            </span>
-                          </td>
-                          <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p className="text-gray-900 whitespace-no-wrap">
-                              {target.type}
-                            </p>
-                          </td>
+                          {/* عملیات */}
                           <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <div className="flex justify-center items-center gap-x-4">
                               <Link href={`target/${target.id}`} passHref>
