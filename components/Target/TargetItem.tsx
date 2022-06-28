@@ -1,36 +1,102 @@
-import { CameraIcon, CubeIcon, VideoCameraIcon } from "@heroicons/react/outline";
-import Image from "next/image";
-import { useState, useEffect } from "react";
+import {
+  CameraIcon,
+  CubeIcon,
+  EyeIcon,
+  VideoCameraIcon,
+} from '@heroicons/react/outline'
+import Image from 'next/image'
+import { useState, useEffect } from 'react'
+import { PencilIcon, XIcon } from '@heroicons/react/outline'
+import Link from 'next/link'
+import Swal from 'sweetalert2'
+import { useRouter } from 'next/router'
+import { useSession, getSession } from 'next-auth/react'
 
-export default function TargetItem({ target }: any) {
+export default function TargetItem({ target, href }: any) {
+  const { data: session, status } = useSession()
+
   const [pic, setPic] = useState('/images/default.jpg')
+
+  const router = useRouter()
 
   useEffect(() => {
     var picLink = target.media.map((media: any) => {
       return media.link
     })
-      
-    if(picLink[0]){
-      console.log('eeeeeeeeeeeeeee');
-      // setPic('/images/logo.png')
-      // console.log('picLink[0]',picLink[0]);
+
+    if (picLink[0]) {
       setPic(picLink[0])
-    }else{
-      setPic("/images/default.jpg")
+    } else {
+      setPic('/images/default.jpg')
     }
   })
 
+  const showAlert = (targetId: string) => {
+    Swal.fire({
+      title: 'حذف تارگت',
+      text: 'آیا اطمینان به حذف تارگت دارید؟',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#34d399',
+      cancelButtonColor: '#f87171',
+      confirmButtonText: 'آره مطمئنم',
+      cancelButtonText: 'حالا نه',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteTarget(targetId)
+        Swal.fire({
+          title: 'تارگت با موفقیت حذف شد',
+          icon: 'success',
+          confirmButtonText: 'حله',
+        })
+      }
+    })
+  }
 
-	return (
-		<>
-			<div>
+  const deleteMediaTarget = async (targetId: string) => {
+    const endpoint = `https://xrealityapi.sinamn75.com/api/Media/${targetId}`
+    const options = {
+      method: 'DELETE',
+      headers: {
+        Accept: '*/*',
+        Authorization: `${session?.accessToken}`,
+      },
+    }
+    //TODO: DELETE MEDIA FROM TARGET - BACKEND
+    const response = await fetch(endpoint, options)
+    console.log('response', response)
+
+    if (response.status == 200) {
+      router.push('/admin/target')
+    }
+  }
+
+  const deleteTarget = async (targetId: string) => {
+    //delete media first
+    deleteMediaTarget(targetId)
+    //delete data second
+    //TODO: DELETE MEDIA AND TARGET BAKCEND
+
+    // const endpoint = `https://xrealityapi.sinamn75.com/api/category/${targetId}`
+    // const options = {
+    //   method: 'DELETE',
+    //   headers: {
+    //     Accept: '*/*',
+    //     Authorization: `${session?.accessToken}`,
+    //   },
+    // }
+    // const response = await fetch(endpoint, options)
+    // if (response.status == 200) {
+    //   router.push('/admin/target')
+    // }
+  }
+
+  return (
+    <>
+      <div>
         <div className="inline-block rounded-lg overflow-hidden">
-          <a
-            href=""
-            className="block p-4 rounded-lg border border-gray-200"
-          >
-            { console.log('pic', pic)}
-            
+          {/* BUTTONS */}
+          <a href="" className="block p-4 rounded-lg border border-gray-200">
             <Image
               alt=""
               src={pic}
@@ -38,16 +104,43 @@ export default function TargetItem({ target }: any) {
               height={400}
               className="w-full h-56 rounded-md"
             />
+
             <div className="mt-2">
               <dl>
-                <div>
+                <div className="flex justify-between items-center">
                   {/* عنوان */}
-                  <dd className="font-medium text-2xl text-indigo-800">
+                  <h3 className="font-medium text-2xl text-indigo-800">
                     {target.title}
-                  </dd>
+                  </h3>
+                  <div className="flex items-center">
+                    {/* EDIT */}
+                    <Link href={`/admin/target/${target.id}`} passHref>
+                      <a className="z-20 block p-1.5 text-green-700 transition-all bg-green-100 border-2 border-white rounded-full active:bg-green-50 hover:scale-110 focus:outline-none focus:ring">
+                        <PencilIcon className="w-4 h-4 text-green-600" />
+                      </a>
+                    </Link>
+                    {/* VIEW */}
+                    <Link href="" passHref>
+                      <a className="z-20 block p-1.5 text-blue-700 transition-all bg-blue-100 border-2 border-white rounded-full active:bg-blue-50 hover:scale-110 focus:outline-none focus:ring">
+                        <EyeIcon className="w-4 h-4 text-indigo-600" />
+                      </a>
+                    </Link>
+                    {/* DELETE */}
+                    <button
+                      className="z-30 block p-1.5 text-red-700 transition-all bg-red-100 border-2 border-white rounded-full hover:scale-110 focus:outline-none focus:ring active:bg-red-50"
+                      type="button"
+                    >
+                      <XIcon
+                        className="w-4 h-4 text-red-600"
+                        onClick={(e: any) => {
+                          showAlert(e.target.id)
+                        }}
+                      />
+                    </button>
+                  </div>
                 </div>
               </dl>
-              <dl className="flex justify-center items-center gap-x-2 mt-6 text-xs">
+              <dl className="flex justify-around items-center gap-x-2 mt-6 text-xs">
                 {/* گالری تصویر */}
                 <div className="flex justify-between items-center gap-x-2">
                   <CameraIcon className="w-5 h-5 text-gray-300" />
@@ -66,8 +159,8 @@ export default function TargetItem({ target }: any) {
                 </div>
                 {/* سه بعدی */}
                 <div className="flex justify-between items-center gap-x-2">
-        ``          <CubeIcon className="w-5 h-5 text-gray-300" />
-``                      <div className="sm:ml-3 mt-1.5 sm:mt-0">
+                  <CubeIcon className="w-5 h-5 text-gray-300" />
+                  <div className="sm:ml-3 mt-1.5 sm:mt-0">
                     <dt className="text-gray-500">سه بعدی</dt>
                     <dd className="font-medium">4</dd>
                   </div>
@@ -76,7 +169,7 @@ export default function TargetItem({ target }: any) {
             </div>
           </a>
         </div>
-			</div>
-		</>
-	)
+      </div>
+    </>
+  )
 }
