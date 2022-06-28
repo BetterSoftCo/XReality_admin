@@ -5,7 +5,6 @@ import { Formik, Form, Field, ErrorMessage } from 'formik'
 import Link from 'next/link'
 import { useSession, getSession } from 'next-auth/react'
 import { useState, useEffect } from 'react'
-import SelectField from 'components/FormElement/SelectField'
 
 const gender_options = [
   {
@@ -24,7 +23,9 @@ interface ISelectInput {
 }
 
 type userType = {
-  id: string
+  phoneNumber: string
+  userName: string
+  email: string
   firstName: string
   lastName: string
   fullName: string
@@ -34,108 +35,38 @@ type userType = {
   appUserName: string
   appPhoneNumber: string
   appEmail: string
-  email: string
+  type: string
+  region: string
+  activity: string
+  suspend: string
+  wallet: 0
+  showContactInfo: string
   birthDate: string
-  genderId: number
+  genderId: 0
 }
-
-const initialValues = {
-  firstName: '',
-  lastName: '',
-  fullName: '',
-  bio: '',
-  headline: '',
-  website: '',
-  appUserName: '',
-  appPhoneNumber: '',
-  appEmail: '',
-  email: '',
-  birthDate: '',
-  genderId: 0,
-}
-
-const onSubmit = async (values: any) => {
-  console.log('values', values)
-
-  // const JSONdata = JSON.stringify(values)
-  // const endpoint = 'https://xrealityapi.sinamn75.com/api/user/UpdateProfile'
-  // const options = {
-  //   method: 'PUT',
-  //   headers: {
-  //     accept: 'text/plain',
-  //     'Content-Type': 'application/json',
-  //   },
-  //   body: JSONdata,
-  // }
-
-  // const response = await fetch(endpoint, options)
-  // const result = await response.json()
-
-  // const res = await fetch(
-  //   `https://xrealityapi.sinamn75.com/api/user/${result.id}`,
-  // )
-
-  // if (res.status == 200) showToast('success')
-  // if (res.status == 400) showToast('error')
-}
-
-const validationSchema = Yup.object({
-  firstName: Yup.string(),
-  lastName: Yup.string(),
-  fullName: Yup.string(),
-  bio: Yup.string(),
-  headline: Yup.string(),
-  website: Yup.string(),
-  appUserName: Yup.string(),
-  appPhoneNumber: Yup.string(),
-  appEmail: Yup.string(),
-  email: Yup.string().email(),
-  birthDate: Yup.date(),
-})
 
 export default function Profile({ user }: any) {
   const { data: session } = useSession()
   const [userId, setUserId] = useState('')
-  const [text, setText] = useState({
-    firstName: '',
-    lastName: '',
-    fullName: '',
-    bio: '',
-    headline: '',
-    website: '',
-    appUserName: '',
-    appPhoneNumber: '',
-    appEmail: '',
-    email: '',
-    birthDate: '',
-    genderId: 0,
-  })
 
-  useEffect(() => {
-    setUserId(session?.user?.id)
-    setText({
-      firstName: user.firstName,
-      lastName: user.lastName,
-      fullName: user.fullName,
-      bio: user.bio,
-      headline: user.headline,
-      website: user.website,
-      appUserName: user.appUserName,
-      appPhoneNumber: user.appPhoneNumber,
-      appEmail: user.appEmail,
-      email: user.email,
-      birthDate: user.birthDate,
-      genderId: user.genderId,
-    })
-  }, [])
-
-  const handleInputChange = (e: any) => {
-    setText(e.target.value)
+  const initialValues = {
+    firstName: user.firstName,
+    lastName: user.lastName,
+    fullName: user.fullName,
+    bio: user.bio,
+    headline: user.headline,
+    website: user.website,
+    appUserName: user.appUserName,
+    appPhoneNumber: user.appPhoneNumber,
+    appEmail: user.appEmail,
+    email: user.email,
+    birthDate: user.birthDate,
+    // genderId: 0,
   }
 
-  const showToast = (type: string) => {
+  const showToast = (type: any) => {
     if (type == 'success') {
-      toast.success('اطلاعات کاربر با موفقیت ویرایش شد', {
+      toast.success('فرم با موفقیت ارسال شد', {
         position: 'bottom-center',
       })
     } else if (type == 'error') {
@@ -144,6 +75,49 @@ export default function Profile({ user }: any) {
       })
     }
   }
+
+  const onSubmit = async (values: any) => {
+    console.log('values', values)
+
+    const JSONdata = JSON.stringify(values)
+    const endpoint = 'https://xrealityapi.sinamn75.com/api/user/UpdateProfile'
+    const options = {
+      method: 'PUT',
+      headers: {
+        accept: 'text/plain',
+        'Content-Type': 'application/json',
+      },
+      body: JSONdata,
+    }
+
+    const response = await fetch(endpoint, options)
+    const result = await response.json()
+
+    const res = await fetch(
+      `https://xrealityapi.sinamn75.com/api/user/${result.id}`,
+    )
+
+    if (res.status == 200) showToast('success')
+    if (res.status == 400) showToast('error')
+  }
+
+  const validationSchema = Yup.object({
+    firstName: Yup.string().nullable(),
+    lastName: Yup.string().nullable(),
+    fullName: Yup.string().nullable(),
+    bio: Yup.string().nullable(),
+    headline: Yup.string().nullable(),
+    website: Yup.string().nullable(),
+    appUserName: Yup.string(),
+    appPhoneNumber: Yup.string().nullable(),
+    appEmail: Yup.string().email('لطفا ایمیل معتبر وارد کنید').nullable(),
+    email: Yup.string().email('لطفا ایمیل معتبر وارد کنید').nullable(),
+    birthDate: Yup.string().nullable(),
+  })
+
+  useEffect(() => {
+    setUserId(session?.user?.id)
+  }, [])
 
   // const handleReset = (resetForm: any) => {
   //   if (window.confirm('Reset?')) {
@@ -172,8 +146,8 @@ export default function Profile({ user }: any) {
               >
                 {(formProps) => (
                   <Form
-                    action="https://xrealityapi.sinamn75.com/api/user/UpdateProfile"
-                    method="PUT"
+                  // action="https://xrealityapi.sinamn75.com/api/user/UpdateProfile"
+                  // method="PUT"
                   >
                     <div className="shadow overflow-hidden sm:rounded-md">
                       <div className="px-4 py-5 bg-white sm:p-6">
@@ -192,8 +166,18 @@ export default function Profile({ user }: any) {
                               id="firstName"
                               name="firstName"
                               placeholder="نام"
-                              value={text.firstName}
-                              onChange={(e: any) => handleInputChange(e)}
+                              value={initialValues.firstName}
+                              // onChange={(e: any) => {
+                              //   formProps.setFieldValue(
+                              //     'firstName',
+                              //     e.target.values,
+                              //   )
+                              // }}
+                            />
+                            <ErrorMessage
+                              name="firstName"
+                              component="div"
+                              className="text-red-500 text-right mt-1"
                             />
                           </div>
                           {/* نام خانوادگی */}
@@ -210,8 +194,12 @@ export default function Profile({ user }: any) {
                               id="lastName"
                               name="lastName"
                               placeholder="نام خانوادگی"
-                              value={text.lastName}
-                              onChange={(e: any) => handleInputChange(e)}
+                              value={initialValues.lastName}
+                            />
+                            <ErrorMessage
+                              name="lastName"
+                              component="div"
+                              className="text-red-500 text-right mt-1"
                             />
                           </div>
                           {/* نام کامل */}
@@ -228,12 +216,16 @@ export default function Profile({ user }: any) {
                               id="fullName"
                               name="fullName"
                               placeholder="نام کامل"
-                              value={text.fullName}
-                              onChange={(e: any) => handleInputChange(e)}
+                              value={initialValues.fullName}
+                            />
+                            <ErrorMessage
+                              name="fullName"
+                              component="div"
+                              className="text-red-500 text-right mt-1"
                             />
                           </div>
                           {/* جنسیت */}
-                          <div className="col-span-6 sm:col-span-3">
+                          {/* <div className="col-span-6 sm:col-span-3">
                             <label
                               htmlFor="genderId"
                               className="block text-sm font-medium text-gray-700"
@@ -248,7 +240,7 @@ export default function Profile({ user }: any) {
                               component={SelectField}
                               options={gender_options}
                             />
-                          </div>
+                          </div> */}
                           {/* عنوان */}
                           <div className="col-span-6 sm:col-span-3">
                             <label
@@ -263,8 +255,12 @@ export default function Profile({ user }: any) {
                               id="headline"
                               name="headline"
                               placeholder="عنوان"
-                              value={text.headline}
-                              onChange={(e: any) => handleInputChange(e)}
+                              value={initialValues.headline}
+                            />
+                            <ErrorMessage
+                              name="headline"
+                              component="div"
+                              className="text-red-500 text-right mt-1"
                             />
                           </div>
                           {/* وب سایت */}
@@ -281,8 +277,12 @@ export default function Profile({ user }: any) {
                               id="website"
                               name="website"
                               placeholder="وب سایت"
-                              value={text.website}
-                              onChange={(e: any) => handleInputChange(e)}
+                              value={initialValues.website}
+                            />
+                            <ErrorMessage
+                              name="website"
+                              component="div"
+                              className="text-red-500 text-right mt-1"
                             />
                           </div>
                           {/*  نام کاربری اپلیکیشن */}
@@ -300,8 +300,12 @@ export default function Profile({ user }: any) {
                               name="appUserName"
                               placeholder="نام کاربری اپلیکیشن"
                               disabled
-                              value={text.appUserName}
-                              onChange={(e: any) => handleInputChange(e)}
+                              value={initialValues.appUserName}
+                            />
+                            <ErrorMessage
+                              name="appUserName"
+                              component="div"
+                              className="text-red-500 text-right mt-1"
                             />
                           </div>
                           {/* شماره موبایل اپلیکیشن */}
@@ -317,10 +321,20 @@ export default function Profile({ user }: any) {
                               type="text"
                               id="appPhoneNumber"
                               name="appPhoneNumber"
-                              disabled
+                              // disabled
                               placeholder="شماره موبایل اپلیکیشن"
-                              value={text.appPhoneNumber}
-                              onChange={(e: any) => handleInputChange(e)}
+                              value={initialValues.appPhoneNumber}
+                              // onChange={(e: any) => {
+                              //   formProps.setFieldValue(
+                              //     'appPhoneNumber',
+                              //     e.target.value,
+                              //   )
+                              // }}
+                            />
+                            <ErrorMessage
+                              name="appPhoneNumber"
+                              component="div"
+                              className="text-red-500 text-right mt-1"
                             />
                           </div>
                           {/* ایمیل اپلیکیشن */}
@@ -337,8 +351,12 @@ export default function Profile({ user }: any) {
                               id="appEmail"
                               name="appEmail"
                               placeholder="ایمیل اپلیکیشن"
-                              value={text.appEmail}
-                              onChange={(e: any) => handleInputChange(e)}
+                              value={initialValues.appEmail}
+                            />
+                            <ErrorMessage
+                              name="appEmail"
+                              component="div"
+                              className="text-red-500 text-right mt-1"
                             />
                           </div>
                           {/* ایمیل */}
@@ -355,8 +373,12 @@ export default function Profile({ user }: any) {
                               id="email"
                               name="email"
                               placeholder="ایمیل"
-                              value={text.appEmail}
-                              onChange={(e: any) => handleInputChange(e)}
+                              value={initialValues.email}
+                            />
+                            <ErrorMessage
+                              name="email"
+                              component="div"
+                              className="text-red-500 text-right mt-1"
                             />
                           </div>
                           {/* تاریخ تولد */}
@@ -373,8 +395,12 @@ export default function Profile({ user }: any) {
                               id="birthDate"
                               name="birthDate"
                               placeholder="تاریخ تولد"
-                              value={text.birthDate}
-                              onChange={(e: any) => handleInputChange(e)}
+                              value={initialValues.birthDate}
+                            />
+                            <ErrorMessage
+                              name="birthDate"
+                              component="div"
+                              className="text-red-500 text-right mt-1"
                             />
                           </div>
                           {/* بیوگرافی */}
@@ -392,8 +418,12 @@ export default function Profile({ user }: any) {
                               id="bio"
                               name="bio"
                               placeholder="بیوگرافی"
-                              value={text.bio}
-                              onChange={(e: any) => handleInputChange(e)}
+                              value={initialValues.bio}
+                            />
+                            <ErrorMessage
+                              name="bio"
+                              component="div"
+                              className="text-red-500 text-right mt-1"
                             />
                           </div>
                         </div>
@@ -428,15 +458,16 @@ export default function Profile({ user }: any) {
 
 export async function getServerSideProps(context: any) {
   const session = await getSession(context)
+  console.log('session',session);
 
   const response = await fetch(
-    `https://xrealityapi.sinamn75.com/api/user/${session?.user?.id}`,
+    `https://xrealityapi.sinamn75.com/api/user`,
   )
-  const user_data = await response.json()
+  const user = await response.json()
 
   return {
     props: {
-      user: user_data.result,
+      user: user.result,
     },
   }
 }
