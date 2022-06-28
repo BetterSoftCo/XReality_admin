@@ -4,6 +4,10 @@ import Link from 'next/link'
 import { useSession, getSession } from 'next-auth/react'
 import Swal from 'sweetalert2'
 import { useRouter } from 'next/router'
+import TargetItem from 'components/Target/TargetItem'
+import Pagination from 'components/Pagination'
+import { useState } from 'react'
+import { paginate } from 'utils/paginate'
 
 type targetType = {
   id: string
@@ -17,9 +21,19 @@ type targetType = {
   type: string
 }
 
+
 const Targets = ({ targets }: any) => {
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 9
+
   const { data: session, status } = useSession()
   const router = useRouter()
+
+  const handlePageChange = (page: number)=>{
+    setCurrentPage(page)
+  }
+
+  const paginateTargets = paginate(targets, currentPage, pageSize)
 
   const showAlert = (targetId: string) => {
     Swal.fire({
@@ -86,7 +100,7 @@ const Targets = ({ targets }: any) => {
         {targets && (
           <div className="px-8">
             <div className="flex justify-between items-start">
-              <div className="flex flex-col justify-center items-start">
+              <div className="flex flex-col justify-center items-center mb-4">
                 <h2 className="text-2xl text-indigo-800 font-medium mb-2">
                   تارگت ها
                 </h2>
@@ -97,117 +111,14 @@ const Targets = ({ targets }: any) => {
                 </a>
               </Link>
             </div>
-            <div className="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
-              <div className="inline-block min-w-full shadow rounded-lg overflow-hidden">
-                <table className="min-w-full leading-normal">
-                  <thead>
-                    <tr>
-                      {/* شماره ردیف */}
-                      <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600">
-                        شماره ردیف
-                      </th>
-                      {/* عنوان */}
-                      <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600">
-                        عنوان
-                      </th>
-                      {/* عنوان1 */}
-                      <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600">
-                        عنوان1
-                      </th>
-                      {/* زیرعنوان */}
-                      <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600">
-                        زیرعنوان
-                      </th>
-                      {/* لینک */}
-                      <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600">
-                        لینک
-                      </th>
-                      {/* عملیات */}
-                      <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600">
-                        عملیات
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {targets.map((target: targetType, index: number) => (
-                      <>
-                        <tr>
-                          {/* شماره ردیف */}
-                          <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <div className="flex items-center">
-                              <div className="ml-3">
-                                <p className="text-gray-900 whitespace-no-wrap">
-                                  {index + 1}
-                                </p>
-                              </div>
-                            </div>
-                          </td>
-                          {/* عنوان */}
-                          <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p className="text-gray-900 whitespace-no-wrap">
-                              {target.title}
-                            </p>
-                          </td>
-                          {/* عنوان 1 */}
-                          <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p className="text-gray-900 whitespace-no-wrap">
-                              {target.titleTr1}
-                            </p>
-                          </td>
-                          {/* زیرعنوان */}
-                          <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <p className="text-gray-900 whitespace-no-wrap">
-                              {target.subtitle}
-                            </p>
-                          </td>
-                          {/* لینک */}
-                          <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <span className="relative inline-block px-3 py-1 font-semibold text-yellow-700 leading-tight">
-                              <span
-                                aria-hidden
-                                className="absolute inset-0 bg-yellow-100 opacity-50 rounded-full"
-                              ></span>
-                              <span className="relative">{target.link}</span>
-                            </span>
-                          </td>
-                          {/* عملیات */}
-                          <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <div className="flex justify-center items-center gap-x-4">
-                              <Link href={`target/${target.id}`} passHref>
-                                <a>
-                                  <PencilIcon className="w-5 text-green-500  cursor-pointer" />
-                                </a>
-                              </Link>
-                              <XIcon
-                                className="w-5 text-red-500 cursor-pointer"
-                                onClick={() => showAlert(target.id)}
-                              />
-                            </div>
-                          </td>
-                        </tr>
-                      </>
-                    ))}
-                  </tbody>
-                </table>
-                <div className="px-5 py-5 bg-white border-t flex flex-col xs:flex-row items-center xs:justify-between">
-                  <span className="text-xs xs:text-sm text-gray-900">
-                    Showing 1 to 4 of 50 Entries
-                  </span>
-                  <div className="inline-flex mt-2 xs:mt-0">
-                    <button className="text-sm text-indigo-50 transition duration-150 hover:bg-indigo-500 bg-indigo-600 font-semibold py-2 px-4 rounded-r">
-                      قبلی
-                    </button>
-                    &nbsp; &nbsp;
-                    <button className="text-sm text-indigo-50 transition duration-150 hover:bg-indigo-500 bg-indigo-600 font-semibold py-2 px-4 rounded-l">
-                      بعدی
-                    </button>
-                  </div>
-                </div>
-              </div>
+             <div className="grid grid-cols-3 gap-x-3 gap-y-4">
+              {paginateTargets.map((target: targetType) => (
+                <TargetItem key={target.id} target={target} />
+              ))}
             </div>
+            <Pagination items={targets.length} currentPage={currentPage} pageSize={pageSize} onPageChange={handlePageChange} /> 
           </div>
         )}
-        {/* {!targets && <SkeletonArticle />} */}
       </AdminLayout>
     </>
   )
