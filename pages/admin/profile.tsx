@@ -5,6 +5,8 @@ import { Formik, Form, Field, ErrorMessage } from 'formik'
 import Link from 'next/link'
 import { useSession, getSession } from 'next-auth/react'
 import { useState, useEffect } from 'react'
+import SelectField from 'components/FormElement/SelectField'
+import { DatePicker } from 'jalali-react-datepicker'
 
 const gender_options = [
   {
@@ -48,6 +50,10 @@ type userType = {
 export default function Profile({ user }: any) {
   const { data: session } = useSession()
   const [userId, setUserId] = useState('')
+
+  useEffect(() => {
+    setUserId(session?.user?.id)
+  }, [])
 
   const initialValues = {
     firstName: user.firstName,
@@ -115,10 +121,6 @@ export default function Profile({ user }: any) {
     birthDate: Yup.string().nullable(),
   })
 
-  useEffect(() => {
-    setUserId(session?.user?.id)
-  }, [])
-
   // const handleReset = (resetForm: any) => {
   //   if (window.confirm('Reset?')) {
   //     resetForm()
@@ -146,12 +148,64 @@ export default function Profile({ user }: any) {
               >
                 {(formProps) => (
                   <Form
-                  // action="https://xrealityapi.sinamn75.com/api/user/UpdateProfile"
-                  // method="PUT"
+                    action="https://xrealityapi.sinamn75.com/api/user/UpdateProfile"
+                    method="PUT"
                   >
                     <div className="shadow overflow-hidden sm:rounded-md">
                       <div className="px-4 py-5 bg-white sm:p-6">
                         <div className="grid grid-cols-6 gap-6">
+                          {/*  نام کاربری اپلیکیشن */}
+                          <div className="col-span-6 sm:col-span-3">
+                            <label
+                              htmlFor="appUserName"
+                              className="block text-sm font-medium text-gray-700"
+                            >
+                              نام کاربری اپلیکیشن
+                            </label>
+                            <Field
+                              className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md bg-gray-200"
+                              type="text"
+                              id="appUserName"
+                              name="appUserName"
+                              placeholder="نام کاربری اپلیکیشن"
+                              // disabled
+                              value={formProps.values.appUserName}
+                            />
+                            <ErrorMessage
+                              name="appUserName"
+                              component="div"
+                              className="text-red-500 text-right mt-1"
+                            />
+                          </div>
+                          {/* شماره موبایل اپلیکیشن */}
+                          <div className="col-span-6 sm:col-span-3">
+                            <label
+                              htmlFor="appPhoneNumber"
+                              className="block text-sm font-medium text-gray-700"
+                            >
+                              شماره موبایل اپلیکیشن
+                            </label>
+                            <Field
+                              className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md bg-gray-200"
+                              type="text"
+                              id="appPhoneNumber"
+                              name="appPhoneNumber"
+                              // disabled
+                              placeholder="شماره موبایل اپلیکیشن"
+                              value={formProps.values.appPhoneNumber}
+                              onChange={(e: any) => {
+                                formProps.setFieldValue(
+                                  'appPhoneNumber',
+                                  e.target.value.appPhoneNumber,
+                                )
+                              }}
+                            />
+                            <ErrorMessage
+                              name="appPhoneNumber"
+                              component="div"
+                              className="text-red-500 text-right mt-1"
+                            />
+                          </div>
                           {/* نام */}
                           <div className="col-span-6 sm:col-span-3">
                             <label
@@ -225,7 +279,7 @@ export default function Profile({ user }: any) {
                             />
                           </div>
                           {/* جنسیت */}
-                          {/* <div className="col-span-6 sm:col-span-3">
+                          <div className="col-span-6 sm:col-span-3">
                             <label
                               htmlFor="genderId"
                               className="block text-sm font-medium text-gray-700"
@@ -240,7 +294,7 @@ export default function Profile({ user }: any) {
                               component={SelectField}
                               options={gender_options}
                             />
-                          </div> */}
+                          </div>
                           {/* عنوان */}
                           <div className="col-span-6 sm:col-span-3">
                             <label
@@ -255,7 +309,7 @@ export default function Profile({ user }: any) {
                               id="headline"
                               name="headline"
                               placeholder="عنوان"
-                              value={initialValues.headline}
+                              value={formProps.values.headline}
                             />
                             <ErrorMessage
                               name="headline"
@@ -277,62 +331,10 @@ export default function Profile({ user }: any) {
                               id="website"
                               name="website"
                               placeholder="وب سایت"
-                              value={initialValues.website}
+                              value={formProps.values.website}
                             />
                             <ErrorMessage
                               name="website"
-                              component="div"
-                              className="text-red-500 text-right mt-1"
-                            />
-                          </div>
-                          {/*  نام کاربری اپلیکیشن */}
-                          <div className="col-span-6 sm:col-span-3">
-                            <label
-                              htmlFor="appUserName"
-                              className="block text-sm font-medium text-gray-700"
-                            >
-                              نام کاربری اپلیکیشن
-                            </label>
-                            <Field
-                              className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md bg-gray-200"
-                              type="text"
-                              id="appUserName"
-                              name="appUserName"
-                              placeholder="نام کاربری اپلیکیشن"
-                              disabled
-                              value={initialValues.appUserName}
-                            />
-                            <ErrorMessage
-                              name="appUserName"
-                              component="div"
-                              className="text-red-500 text-right mt-1"
-                            />
-                          </div>
-                          {/* شماره موبایل اپلیکیشن */}
-                          <div className="col-span-6 sm:col-span-3">
-                            <label
-                              htmlFor="appPhoneNumber"
-                              className="block text-sm font-medium text-gray-700"
-                            >
-                              شماره موبایل اپلیکیشن
-                            </label>
-                            <Field
-                              className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md bg-gray-200"
-                              type="text"
-                              id="appPhoneNumber"
-                              name="appPhoneNumber"
-                              // disabled
-                              placeholder="شماره موبایل اپلیکیشن"
-                              value={initialValues.appPhoneNumber}
-                              // onChange={(e: any) => {
-                              //   formProps.setFieldValue(
-                              //     'appPhoneNumber',
-                              //     e.target.value,
-                              //   )
-                              // }}
-                            />
-                            <ErrorMessage
-                              name="appPhoneNumber"
                               component="div"
                               className="text-red-500 text-right mt-1"
                             />
@@ -351,7 +353,7 @@ export default function Profile({ user }: any) {
                               id="appEmail"
                               name="appEmail"
                               placeholder="ایمیل اپلیکیشن"
-                              value={initialValues.appEmail}
+                              value={formProps.values.appEmail}
                             />
                             <ErrorMessage
                               name="appEmail"
@@ -373,7 +375,7 @@ export default function Profile({ user }: any) {
                               id="email"
                               name="email"
                               placeholder="ایمیل"
-                              value={initialValues.email}
+                              value={formProps.values.email}
                             />
                             <ErrorMessage
                               name="email"
@@ -389,13 +391,11 @@ export default function Profile({ user }: any) {
                             >
                               تاریخ تولد
                             </label>
-                            <Field
-                              className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                              type="text"
+                            <DatePicker
+                              className="mt-1 focus:ring-indigo-500 border px-3 py-2 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                              value={formProps.values.birthDate}
                               id="birthDate"
                               name="birthDate"
-                              placeholder="تاریخ تولد"
-                              value={initialValues.birthDate}
                             />
                             <ErrorMessage
                               name="birthDate"
@@ -418,7 +418,7 @@ export default function Profile({ user }: any) {
                               id="bio"
                               name="bio"
                               placeholder="بیوگرافی"
-                              value={initialValues.bio}
+                              value={formProps.values.bio}
                             />
                             <ErrorMessage
                               name="bio"
@@ -458,10 +458,9 @@ export default function Profile({ user }: any) {
 
 export async function getServerSideProps(context: any) {
   const session = await getSession(context)
-  console.log('session',session);
 
   const response = await fetch(
-    `https://xrealityapi.sinamn75.com/api/user`,
+    `https://xrealityapi.sinamn75.com/api/user/${session.user.id}`,
   )
   const user = await response.json()
 
