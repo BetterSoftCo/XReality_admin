@@ -38,7 +38,8 @@
     "pages/_app.jsx",
     "pages/auth/signin.js",
     "pages/api/auth/[...nextauth].js",
-    "components/Preview/index.js"
+    "components/Preview/index.js",
+    "components/Preview/index.jsx"
   ],
   "exclude": ["node_modules", "types", ".next", "out"]
 }
