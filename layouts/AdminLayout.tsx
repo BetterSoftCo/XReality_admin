@@ -1,9 +1,6 @@
 import { useRouter } from 'next/router'
 import { Sidebar } from 'components/Sidebar'
-import Link from 'next/link'
 import TopHeaderNotification from 'components/Header/TopHeaderNotification'
-import { BadgeCheckIcon, CheckIcon } from '@heroicons/react/outline'
-import Image from 'next/image'
 
 export default function AdminLayout({ children }: any) {
   const router = useRouter()
