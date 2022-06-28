@@ -109,9 +109,9 @@ const AddTarget = () => {
     addData(values)
   }
 
-  const handleReset = (resetForm: any) => {
-    resetForm()
-  }
+  // const handleReset = (resetForm: any) => {
+  //   resetForm()
+  // }
 
   const validationSchema = Yup.object({
     title: Yup.string(),
@@ -123,6 +123,14 @@ const AddTarget = () => {
     type: Yup.string(),
     media: Yup.mixed().required(),
   })
+
+  // const handleDeleteFile = (idx: any) => {
+  //   var files_result = imageFiles
+  //     .filter((file, index) => index !== idx)
+  //     .map((file) => file)
+
+  //   setImageFiles(files_result)
+  // }
 
   return (
     <>
@@ -180,17 +188,22 @@ const AddTarget = () => {
                                 <p className="pr-1">(حداکثر 10 مگابایت)</p>
                               </div>
                               <p className="text-xs text-gray-500">
-                                PNG, JPG, JPEG
-                              </p>
+                               PNG, JPG, JPEG
+                              </p>  
                             </div>
                           </div>
                           {/* preview image */}
                           <div className="mt-5">
-                            {formProps.values.media ? (
+                             {formProps.values.media ? (
                               <>
                                 <PreviewImage file={formProps.values.media} />
                                 <button>
-                                  <XIcon className="w-7 h-7 bg-gray-200 text-indigo-600 rounded-lg p-1 cursor-pointer" />
+                                  <XIcon
+                                    className="w-7 h-7 bg-gray-200 text-indigo-600 rounded-lg p-1 cursor-pointer"
+                                    // onClick={() => {
+                                    //   handleDeleteFile(idx)
+                                    // }}
+                                  />
                                 </button>
                               </>
                             ) : null}
@@ -211,6 +224,11 @@ const AddTarget = () => {
                             id="title"
                             name="title"
                             placeholder="عنوان"
+                          />
+                          <ErrorMessage
+                            name="title"
+                            component="div"
+                            className="text-red-500 text-right mt-1"
                           />
                         </div>
                         {/* عنوان 1 */}
