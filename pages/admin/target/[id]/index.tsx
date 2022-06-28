@@ -250,6 +250,7 @@ export async function getServerSideProps(context: any) {
   const session = await getSession(context)
   const { params, query } = context
 
+  //TODO: BACKEND SHOULD COMPLETE -GETBYID
   const endpoint = `https://xrealityapi.sinamn75.com/api/Category/${query.id}`
   const options = {
     method: 'GET',
