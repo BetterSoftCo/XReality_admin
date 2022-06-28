@@ -8,12 +8,14 @@ import Image from 'next/image'
 import toast, { Toaster } from 'react-hot-toast'
 import { useSession, getSession } from 'next-auth/react'
 
-export default function SignIn({ csrfToken }) {
+export default function SignIn() {
   const router = useRouter()
   const [error, setError] = useState(null)
   const [isSendCode, setIsSendCode] = useState(false)
   const [token, setToken] = useState('')
   const [mobile, setMobile] = useState('')
+
+  const { data: session, status } = useSession()
 
   //==========================getmobileforverification==========================
 
@@ -109,8 +111,6 @@ export default function SignIn({ csrfToken }) {
     setSubmitting(false)
   }
 
-  const { data: session, status } = useSession()
-
   return (
     <>
       {!isSendCode ? (
@@ -194,11 +194,7 @@ export default function SignIn({ csrfToken }) {
                   <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
                     کد تایید برای شما ارسال شد
                   </h2>
-                  {/* <input
-                    name="csrfToken"
-                    type="hidden"
-                    defaultValue={csrfToken}
-                  /> */}
+
                   <div className="text-red-400 text-md text-center rounded p-2">
                     {error}
                   </div>
@@ -231,7 +227,6 @@ export default function SignIn({ csrfToken }) {
                         />
                       </span>
                       ارسال
-                      {/* {formik.isSubmitting ? 'در حال لود شدن...' : 'ورود'} */}
                     </button>
                   </div>
                 </div>
@@ -243,15 +238,6 @@ export default function SignIn({ csrfToken }) {
     </>
   )
 }
-
-// This is the recommended way for Next.js 9.3 or newer
-// export async function getServerSideProps(context) {
-//   return {
-//     props: {
-//       csrfToken: await getCsrfToken(context),
-//     },
-//   }
-// }
 
 export async function getServerSideProps(context) {
   console.log('sessiio1 new ', await getSession(context))
