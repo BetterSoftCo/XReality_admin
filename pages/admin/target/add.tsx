@@ -10,11 +10,16 @@ import { useRouter } from 'next/router'
 import { PreviewImage } from 'components/Preview'
 import { ViewGridAddIcon, XIcon } from '@heroicons/react/outline'
 import { StarIcon } from '@heroicons/react/solid'
+import Image from 'next/image'
+
+const imageTypeRegex = /image\/(png|jpg|jpeg)/gm
 
 const AddTarget = () => {
   const { data: session } = useSession()
   const [userId, setUserId] = useState('')
-  const [image, setImage] = useState(null)
+  // const [image, setImage] = useState(null)
+  const [imageFiles, setImageFiles] = useState([])
+  const [images, setImages] = useState([])
 
   var categoryId = ''
 
@@ -22,7 +27,37 @@ const AddTarget = () => {
 
   useEffect(() => {
     setUserId(session?.user?.id)
-  }, [image])
+    // preview uploaded images
+    const images: any = [],
+      fileReaders: any[] = []
+    let isCancel = false
+    if (imageFiles.length) {
+      imageFiles.forEach((file) => {
+        const fileReader = new FileReader()
+        fileReaders.push(fileReader)
+        fileReader.onload = (e) => {
+          const { result }: any = e.target
+          if (result) {
+            images.push(result)
+          }
+          if (images.length === imageFiles.length && !isCancel) {
+            setImages(images)
+          }
+        }
+        fileReader.readAsDataURL(file)
+      })
+      // end preview uploaded images
+    }
+
+    return () => {
+      isCancel = true
+      fileReaders.forEach((fileReader) => {
+        if (fileReader.readyState === 1) {
+          fileReader.abort()
+        }
+      })
+    }
+  }, [imageFiles])
 
   const showToast = (type: any) => {
     if (type == 'success') {
@@ -41,7 +76,7 @@ const AddTarget = () => {
     titleTr1: '',
     subtitle: '',
     link: '',
-    media: null,
+    media: [],
   }
 
   const addData = async (values: any) => {
@@ -79,7 +114,10 @@ const AddTarget = () => {
     formData.append('ContentId', '')
     formData.append('UseCase', 'category')
     formData.append('UserId', userId)
-    formData.append('files', values.media)
+    // upload list of files
+    for (let i = 0; i <= values.media.length; i++) {
+      formData.append('Files', values.media[i])
+    }
     formData.append('Title', `${values.media.name}`)
     formData.append('CategoryId', `${categoryId}`)
 
@@ -109,28 +147,37 @@ const AddTarget = () => {
     addData(values)
   }
 
-  // const handleReset = (resetForm: any) => {
-  //   resetForm()
-  // }
-
   const validationSchema = Yup.object({
-    title: Yup.string(),
+    title: Yup.string().required('لطفا نام تارگت را وارد کنید'),
     titleTr1: Yup.string(),
     subtitle: Yup.string(),
     link: Yup.string(),
-    color: Yup.string(),
-    useCase: Yup.string(),
-    type: Yup.string(),
-    media: Yup.mixed().required(),
+    media: Yup.mixed().required('لطفا عکس تارگت را آپلود کنید'),
   })
 
-  // const handleDeleteFile = (idx: any) => {
-  //   var files_result = imageFiles
-  //     .filter((file, index) => index !== idx)
-  //     .map((file) => file)
+  const handleDeleteFile = (idx: any) => {
+    var files_result = imageFiles
+      .filter((file, index) => index !== idx)
+      .map((file) => file)
 
-  //   setImageFiles(files_result)
-  // }
+    setImageFiles(files_result)
+  }
+
+  const changeHandler = (e: any) => {
+    const { files } = e.target
+    const validImageFiles: any = []
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i]
+      if (file.type.match(imageTypeRegex)) {
+        validImageFiles.push(file)
+      }
+    }
+    if (validImageFiles.length) {
+      setImageFiles(validImageFiles)
+      return
+    }
+    toast.error('لطفا عکس با فرمت مناسب آپلود کنید')
+  }
 
   return (
     <>
@@ -178,36 +225,53 @@ const AddTarget = () => {
                                     className="sr-only"
                                     accept="image/*"
                                     onChange={(e: any) => {
-                                      formProps.setFieldValue(
-                                        'media',
-                                        e.target.files[0],
-                                      )
+                                      //check format files
+                                      changeHandler(e)
+
+                                      const files = e.target.files
+                                      let myFiles = Array.from(files)
+                                      formProps.setFieldValue('media', myFiles)
                                     }}
                                   />
                                 </label>
                                 <p className="pr-1">(حداکثر 10 مگابایت)</p>
                               </div>
                               <p className="text-xs text-gray-500">
-                               PNG, JPG, JPEG
-                              </p>  
+                                PNG, JPG, JPEG
+                              </p>
                             </div>
                           </div>
-                          {/* preview image */}
-                          <div className="mt-5">
-                             {formProps.values.media ? (
-                              <>
-                                <PreviewImage file={formProps.values.media} />
-                                <button>
-                                  <XIcon
-                                    className="w-7 h-7 bg-gray-200 text-indigo-600 rounded-lg p-1 cursor-pointer"
-                                    // onClick={() => {
-                                    //   handleDeleteFile(idx)
-                                    // }}
-                                  />
-                                </button>
-                              </>
-                            ) : null}
-                          </div>
+                        </div>
+                        {/* نمایش محتواها */}
+                        <div className="col-span-6 sm:col-span-6 mt-6">
+                          <ErrorMessage
+                            name="media"
+                            component="div"
+                            className="text-red-500 text-right mt-1"
+                          />
+                          {images.length > 0 ? (
+                            <div className="grid grid-cols-12 gap-4">
+                              {images.map((image, idx: number) => {
+                                return (
+                                  <div key={idx}>
+                                    <Image
+                                      src={image}
+                                      alt="preview"
+                                      width={100}
+                                      height={100}
+                                      className="rounded-lg"
+                                    />
+                                    <XIcon
+                                      className="w-6 h-6 bg-gray-200 text-indigo-600 rounded-lg p-1 cursor-pointer"
+                                      onClick={() => {
+                                        handleDeleteFile(idx)
+                                      }}
+                                    />
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          ) : null}
                         </div>
                         {/* عنوان */}
                         <div className="col-span-6 sm:col-span-3">
