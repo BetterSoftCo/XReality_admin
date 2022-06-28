@@ -24,7 +24,6 @@ const AddContent = () => {
   const { data: session } = useSession()
   const [userId, setUserId] = useState('')
 
-  const router = useRouter()
   enum FILE_TYPES {
     gallery = 0,
     video = 1,
@@ -36,22 +35,7 @@ const AddContent = () => {
   const [images, setImages] = useState([])
 
   var productId = ''
-
-  const changeHandler = (e: any) => {
-    const { files } = e.target
-    const validImageFiles: any = []
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i]
-      if (file.type.match(imageTypeRegex)) {
-        validImageFiles.push(file)
-      }
-    }
-    if (validImageFiles.length) {
-      setImageFiles(validImageFiles)
-      return
-    }
-    toast.error('لطفا عکس با فرمت مناسب آپلود کنید')
-  }
+  const router = useRouter()
 
   useEffect(() => {
     setUserId(session?.user?.id)
@@ -75,7 +59,6 @@ const AddContent = () => {
         fileReader.readAsDataURL(file)
       })
     }
-    console.log('images', images)
 
     return () => {
       isCancel = true
@@ -86,6 +69,22 @@ const AddContent = () => {
       })
     }
   }, [imageFiles])
+
+  const changeHandler = (e: any) => {
+    const { files } = e.target
+    const validImageFiles: any = []
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i]
+      if (file.type.match(imageTypeRegex)) {
+        validImageFiles.push(file)
+      }
+    }
+    if (validImageFiles.length) {
+      setImageFiles(validImageFiles)
+      return
+    }
+    toast.error('لطفا عکس با فرمت مناسب آپلود کنید')
+  }
 
   const showToast = (type: any) => {
     if (type == 'success') {
@@ -204,8 +203,8 @@ const AddContent = () => {
     // status: Yup.number().positive().integer(),
     media: Yup.array()
       .min(1, 'لطفا حداقل یک فایل آپلود کنید')
-      .required('لطفا محتوا را آپلود کنید')
-      .nullable(),
+      .required('لطفا محتوا را آپلود کنید'),
+    // .nullable(),
   })
 
   const handleDeleteFile = (idx: any) => {
