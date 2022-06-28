@@ -7,7 +7,7 @@ module.exports = {
   },
   images: {
     // domains: ['c1sys.com', 'c1sys.ir'],
-    domains: ['https://localhost:3001/'],
+    domains: ['localhost', 'xrealityapi.sinamn75.com'],
     formats: ['image/avif', 'image/webp'],
   },
   pageExtensions: ['mdx', 'md', 'jsx', 'js', 'tsx', 'ts'],
