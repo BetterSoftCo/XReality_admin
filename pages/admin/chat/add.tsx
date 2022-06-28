@@ -6,6 +6,7 @@ import { useRouter } from 'next/router'
 import { useSession, getSession } from 'next-auth/react'
 import { useState, useEffect } from 'react'
 import AdminLayout from 'layouts/AdminLayout'
+import { SearchIcon } from '@heroicons/react/outline'
 
 const Add_Chat = () => {
   const { data: session } = useSession()
@@ -73,6 +74,27 @@ const Add_Chat = () => {
               <h2 className="text-2xl text-indigo-800 font-medium mb-2">
                 تیکت جدید
               </h2>
+
+              <div className="pb-14 pt-2 w-full">
+                <ul>
+                  {/* SEARCH BOX */}
+                  <div className="mb-5 flex rounded-md shadow-sm bg-indigo-500">
+                    <input
+                      type="text"
+                      name="search"
+                      id="search"
+                      className="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-none rounded-r-md sm:text-sm border-gray-300 text-right directionLtr"
+                      placeholder="جستجو کنید..."
+                    />
+                    <div className="flex justify-center items-center w-10 h-10">
+                      <SearchIcon className="w-5 h-5 text-indigo-100" />
+                    </div>
+                  </div>
+                  {/* {tickets.map((ticket) => (
+                    <UserTicketItem key={ticket.id} ticket={ticket} />
+                  ))} */}
+                </ul>
+              </div>
 
               <Formik
                 initialValues={initialValues}
