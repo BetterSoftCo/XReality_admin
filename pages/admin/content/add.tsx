@@ -17,13 +17,13 @@ import {
 
 import { StarIcon } from '@heroicons/react/solid'
 import Image from 'next/image'
-import { initial } from 'lodash'
 
 const imageTypeRegex = /image\/(png|jpg|jpeg)/gm
 
 const AddContent = () => {
   const { data: session } = useSession()
   const [userId, setUserId] = useState('')
+
   const router = useRouter()
   enum FILE_TYPES {
     gallery = 0,
@@ -34,7 +34,6 @@ const AddContent = () => {
   const [Active, setActive] = useState(FILE_TYPES.gallery)
   const [imageFiles, setImageFiles] = useState([])
   const [images, setImages] = useState([])
-  const [DeleteFile, setDeleteFile] = useState(0)
 
   var productId = ''
 
@@ -116,7 +115,7 @@ const AddContent = () => {
     height: 0,
     weight: 0,
     status: 0,
-    media: imageFiles,
+    media: [],
   }
 
   const addData = async (values: any) => {
@@ -156,11 +155,7 @@ const AddContent = () => {
     formData.append('UseCase', 'Product')
     formData.append('UserId', userId)
     // upload list of files
-    // values.media.forEach((file: any, index: any) => {
-    //   formData.append(`file${index}`, values.media[index])
-    // })
-
-    for (let i = 0; i < values.media.length; i++) {
+    for (let i = 0; i <= values.media.length; i++) {
       formData.append('Files', values.media[i])
     }
     formData.append('Title', `${values.media.name}`)
@@ -172,7 +167,6 @@ const AddContent = () => {
       headers: {
         Accept: 'text/plain',
         Authorization: `${session?.accessToken}`,
-        // 'Content-Type': 'multipart/form-data',
       },
       body: formData,
     }
@@ -215,8 +209,8 @@ const AddContent = () => {
   })
 
   const handleDeleteFile = (idx: any) => {
-    setDeleteFile(idx)
-    console.log('DeleteFile', DeleteFile)
+    // setDeleteFile(idx)
+    // console.log('DeleteFile', DeleteFile)
 
     var files_result = imageFiles
       .filter((file, index) => index !== idx)
@@ -290,13 +284,15 @@ const AddContent = () => {
                                         className="sr-only"
                                         accept="image/*"
                                         onChange={(e: any) => {
+                                          //check format files
+                                          changeHandler(e)
+
                                           const files = e.target.files
                                           let myFiles = Array.from(files)
                                           formProps.setFieldValue(
                                             'media',
                                             myFiles,
                                           )
-                                          changeHandler(e)
                                         }}
                                         multiple
                                       />
@@ -759,9 +755,31 @@ export default AddContent
 export async function getServerSideProps(context: NextApiResponse) {
   const session = await getSession(context)
 
+  const getAllContent = async () => {
+    const endpoint = 'https://xrealityapi.sinamn75.com/api/user'
+    const options = {
+      method: 'GET',
+      headers: {
+        Accept: 'text/plain',
+        Authorization: `${session?.accessToken}`,
+      },
+    }
+    const response = await fetch(endpoint, options)
+    const contents = await response.json()
+    if (!contents) {
+      return {
+        notFound: true,
+      }
+    }
+    return contents
+  }
+
+  var contents = await getAllContent()
+
   return {
     props: {
       session,
+      contents: contents.result,
     },
   }
 }
