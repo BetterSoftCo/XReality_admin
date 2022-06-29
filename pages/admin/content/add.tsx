@@ -8,13 +8,13 @@ import AdminLayout from 'layouts/AdminLayout'
 import { NextApiResponse } from 'next'
 import { useRouter } from 'next/router'
 import SwitchToggle from 'components/FormElement/SwitchToggle'
+import Swal from 'sweetalert2'
 import {
   CubeIcon,
   VideoCameraIcon,
   ViewGridAddIcon,
   XIcon,
 } from '@heroicons/react/outline'
-
 import { StarIcon } from '@heroicons/react/solid'
 import Image from 'next/image'
 
@@ -40,7 +40,7 @@ const AddContent = () => {
   useEffect(() => {
     setUserId(session?.user?.id)
     // preview uploaded images
-    const images: any = [],
+    const imgs: any = [],
       fileReaders: any[] = []
     let isCancel = false
     if (imageFiles.length) {
@@ -50,10 +50,10 @@ const AddContent = () => {
         fileReader.onload = (e) => {
           const { result }: any = e.target
           if (result) {
-            images.push(result)
+            imgs.push(result)
           }
-          if (images.length === imageFiles.length && !isCancel) {
-            setImages(images)
+          if (imgs.length === imageFiles.length && !isCancel) {
+            setImages(imgs)
           }
         }
         fileReader.readAsDataURL(file)
@@ -208,14 +208,15 @@ const AddContent = () => {
   })
 
   const handleDeleteFile = (idx: any) => {
-    // setDeleteFile(idx)
-    // console.log('DeleteFile', DeleteFile)
-
-    var files_result = imageFiles
+    var imageFilesResult = imageFiles
       .filter((file, index) => index !== idx)
       .map((file) => file)
+    setImageFiles(imageFilesResult)
 
-    setImageFiles(files_result)
+    var imagesResult = images
+      .filter((file, index) => index !== idx)
+      .map((file) => file)
+    setImages(imagesResult)
   }
 
   return (
@@ -223,6 +224,7 @@ const AddContent = () => {
       {session ? (
         <>
           <Toaster />
+          <h2>Active: {Active}</h2>
           <AdminLayout>
             <div className="px-8">
               <h2 className="text-2xl text-indigo-800 font-medium mb-2">
@@ -256,7 +258,19 @@ const AddContent = () => {
                             <div
                               className="space-y-1 text-center"
                               onClick={() => {
-                                setActive(FILE_TYPES.gallery)
+                                formProps.values.media
+                                  ? setActive(FILE_TYPES.gallery)
+                                  : Swal.fire({
+                                      title: 'هشدار',
+                                      text:
+                                        'لطفا فایل های قبلی را حذف کنید و مجدد نوع فایل جدید را انتخاب کنید',
+                                      icon: 'warning',
+                                      showCancelButton: true,
+                                      confirmButtonColor: '#34d399',
+                                      cancelButtonColor: '#f87171',
+                                      cancelButtonText: 'حالا نه',
+                                      confirmButtonText: 'فهمیدم',
+                                    })
                               }}
                             >
                               <ViewGridAddIcon className="mx-auto h-8 w-8 text-gray-300 group-hover:text-white" />
@@ -306,10 +320,23 @@ const AddContent = () => {
                           </div>
                         </div>
                         {/* آپلود ویدئو */}
+                        {console.log('imageFiles', imageFiles.length)}
                         <div
                           className="group col-span-6 sm:col-span-2"
                           onClick={() => {
-                            setActive(FILE_TYPES.video)
+                            formProps.values.media
+                              ? setActive(FILE_TYPES.video)
+                              : Swal.fire({
+                                  title: 'هشدار',
+                                  text:
+                                    'لطفا فایل های قبلی را حذف کنید و مجدد نوع فایل جدید را انتخاب کنید',
+                                  icon: 'warning',
+                                  showCancelButton: true,
+                                  confirmButtonColor: '#34d399',
+                                  cancelButtonColor: '#f87171',
+                                  cancelButtonText: 'حالا نه',
+                                  confirmButtonText: 'فهمیدم',
+                                })
                           }}
                         >
                           <label className="block text-sm fontmedium text-gray-700">
@@ -364,6 +391,21 @@ const AddContent = () => {
                           className="group col-span-6 sm:col-span-2"
                           onClick={() => {
                             setActive(FILE_TYPES.object)
+
+                            formProps.values.media &&
+                            Active == FILE_TYPES.object
+                              ? Swal.fire({
+                                  title: 'هشدار',
+                                  text:
+                                    'لطفا فایل های قبلی را حذف کنید و مجدد نوع فایل جدید را انتخاب کنید',
+                                  icon: 'warning',
+                                  showCancelButton: true,
+                                  confirmButtonColor: '#34d399',
+                                  cancelButtonColor: '#f87171',
+                                  cancelButtonText: 'حالا نه',
+                                  confirmButtonText: 'فهمیدم',
+                                })
+                              : null
                           }}
                         >
                           <label className="block text-sm fontmedium text-gray-700">
