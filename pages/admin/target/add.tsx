@@ -17,7 +17,6 @@ const imageTypeRegex = /image\/(png|jpg|jpeg)/gm
 const AddTarget = () => {
   const { data: session } = useSession()
   const [userId, setUserId] = useState('')
-  // const [image, setImage] = useState(null)
   const [imageFiles, setImageFiles] = useState([])
   const [images, setImages] = useState([])
 
@@ -27,8 +26,12 @@ const AddTarget = () => {
 
   useEffect(() => {
     setUserId(session?.user?.id)
+
+    console.log('imageFiles', imageFiles)
+    console.log('images', images)
+
     // preview uploaded images
-    const images: any = [],
+    const imgs: any = [],
       fileReaders: any[] = []
     let isCancel = false
     if (imageFiles.length) {
@@ -38,10 +41,10 @@ const AddTarget = () => {
         fileReader.onload = (e) => {
           const { result }: any = e.target
           if (result) {
-            images.push(result)
+            imgs.push(result)
           }
-          if (images.length === imageFiles.length && !isCancel) {
-            setImages(images)
+          if (imgs.length === imageFiles.length && !isCancel) {
+            setImages(imgs)
           }
         }
         fileReader.readAsDataURL(file)
@@ -96,8 +99,6 @@ const AddTarget = () => {
 
     if (result.status == 200) {
       categoryId = result.result.id.toString()
-      console.log('result', result)
-
       //add media
       addDataMedia(values)
     }
@@ -130,12 +131,8 @@ const AddTarget = () => {
       },
       body: formData,
     }
-
     const responseMedia = await fetch(endpointMedia, optionsMedia)
-
     const resultMedia = await responseMedia.json()
-    console.log('resultMedia', resultMedia)
-
     if (resultMedia.status == 200) {
       showToast('success')
       router.push('/admin/target')
@@ -156,22 +153,29 @@ const AddTarget = () => {
   })
 
   const handleDeleteFile = (idx: any) => {
-    var files_result = imageFiles
+    var imageFilesResult = imageFiles
       .filter((file, index) => index !== idx)
       .map((file) => file)
+    setImageFiles(imageFilesResult)
 
-    setImageFiles(files_result)
+    var imagesResult = images
+      .filter((file, index) => index !== idx)
+      .map((file) => file)
+    setImages(imagesResult)
   }
 
   const changeHandler = (e: any) => {
     const { files } = e.target
     const validImageFiles: any = []
+    console.log('files.length', files.length)
     for (let i = 0; i < files.length; i++) {
       const file = files[i]
       if (file.type.match(imageTypeRegex)) {
         validImageFiles.push(file)
       }
     }
+    console.log('validImageFiles.length', validImageFiles.length)
+
     if (validImageFiles.length) {
       setImageFiles(validImageFiles)
       return
@@ -224,6 +228,7 @@ const AddTarget = () => {
                                     type="file"
                                     className="sr-only"
                                     accept="image/*"
+                                    multiple
                                     onChange={(e: any) => {
                                       //check format files
                                       changeHandler(e)
@@ -243,7 +248,7 @@ const AddTarget = () => {
                           </div>
                         </div>
                         {/* نمایش محتواها */}
-                        <div className="col-span-6 sm:col-span-6 mt-6">
+                        <div className="col-span-6 sm:col-span-6">
                           <ErrorMessage
                             name="media"
                             component="div"
